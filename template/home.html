@@ -1,0 +1,71 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Media Management</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/style.css' %}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Media Management</h1>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="files" multiple />
+        <button type="submit">Upload</button>
+      </form>
+
+      <h2>Uploaded Files</h2>
+      <ul>
+        {% for file in files %}
+        <li>
+          <span
+            >{{ file.name }} ({{ file.size }} bytes, {{ file.category }})</span
+          >
+          <span class="actions">
+            <a href="{{ file.file.url }}" download="{{ file.name }}"
+              >Download</a
+            >
+            <a href="{% url 'view_file' file.id %}">View</a>
+            <a href="{% url 'deleteFile' file.id %}" class="delete">Delete</a>
+          </span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div id="errorModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Error</h2>
+        <ul id="errorList"></ul>
+      </div>
+    </div>
+
+    <script>
+      {% if errors %}
+        window.onload = function() {
+          var errorModal = document.getElementById("errorModal");
+          var errorList = document.getElementById("errorList");
+
+          {% for error in errors %}
+            var li = document.createElement("li");
+            li.textContent = "{{ error }}";
+            errorList.appendChild(li);
+          {% endfor %}
+
+          errorModal.style.display = "block";
+        };
+      {% endif %}
+
+      // Function to close the modal
+      function closeModal() {
+        document.getElementById("errorModal").style.display = "none";
+      }
+    </script>
+  </body>
+</html>
